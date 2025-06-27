@@ -2,6 +2,7 @@ package functions
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -79,10 +80,19 @@ func BypassUrl(target string, hideFails bool) {
 			}
 			continue
 		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("[-] Error reading response body")
+			continue
+		}
+		resp.Body.Close()
+		size := len(body)
+
 		defer resp.Body.Close()
 
 		if resp.StatusCode == 200 {
-			fmt.Printf("[!] Path: %s → Status: %d [BYPASSED]\n", p, resp.StatusCode)
+			fmt.Printf("[!] Path: %s → Status: %d [BYPASSED] (%d bytes)\n", p, resp.StatusCode, size)
 		} else if !hideFails {
 			fmt.Printf("[*] Path: %s → Status: %d\n", p, resp.StatusCode)
 		}
@@ -120,10 +130,19 @@ func BypassUrl(target string, hideFails bool) {
 			}
 			continue
 		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("[-] Error reading response body")
+			continue
+		}
+		resp.Body.Close()
+		size := len(body)
+
 		defer resp.Body.Close()
 
 		if resp.StatusCode == 200 {
-			fmt.Printf("[*] %s: %s → Status: %d [BYPASSED]\n", header, value, resp.StatusCode)
+			fmt.Printf("[*] %s: %s → Status: %d [BYPASSED] (%d bytes)\n", header, value, resp.StatusCode, size)
 		} else if !hideFails {
 			fmt.Printf("[*] %s: %s → Status: %d\n", header, value, resp.StatusCode)
 		}
